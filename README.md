@@ -65,7 +65,7 @@ jupyter notebook notebooks/01_BSSC_QA_Complete.ipynb
 
 ## 🏗️ Architecture
 
-![Architecture Diagram](docs/architecture_diagram_placeholder.png)
+![Architecture Diagram](images/framework_diagram.png)
 
 The framework consists of three main agents working in sequence:
 
