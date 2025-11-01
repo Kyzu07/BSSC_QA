@@ -1,4 +1,4 @@
-# BSSC_QA Framework: Complete Technical Presentation
+# BSSC_QA Framework: Complete Technical Report
 
 **Author**: Shah Imran.  
 **Date**: November 2025  
@@ -49,40 +49,7 @@ Sentence-BERT      - Text embeddings
 ## 2. Architecture & Design
 
 ### High-Level Architecture
-![Architecture Diagram](images/framework_diagram.png "BSSC-QA")
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     BSSC_QA Framework                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────┐    ┌──────────────┐   ┌──────────────┐  │
-│  │   Document   │───▶│  Ingestion   │──▶│   Vector     │  │
-│  │   Loaders    │    │   Pipeline   │   │   Store      │  │
-│  └──────────────┘    └──────────────┘   └──────────────┘  │
-│                             │                    ▲         │
-│                             ▼                    │         │
-│  ┌─────────────────────────────────────────────┐│         │
-│  │          QA Pipeline Orchestrator           ││         │
-│  └─────────────────────────────────────────────┘│         │
-│                             │                    │         │
-│              ┌──────────────┼──────────────┐     │         │
-│              ▼              ▼              ▼     │         │
-│   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
-│   │  Generator   │ │  Synthesis   │ │  Evaluator   │     │
-│   │    Agent     │ │    Agent     │ │    Agent     │     │
-│   └──────────────┘ └──────────────┘ └──────────────┘     │
-│          │                 │                 │            │
-│          └─────────────────┴─────────────────┘            │
-│                             │                              │
-│                  ┌──────────┴──────────┐                  │
-│                  ▼                     ▼                   │
-│         ┌─────────────┐        ┌─────────────┐            │
-│         │    Tools    │        │     LLM     │            │
-│         │   System    │        │   Factory   │            │
-│         └─────────────┘        └─────────────┘            │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+![Architecture Diagram](images/framework_diagram.png "BSSC-QA")   
 
 ### Agent Workflow
 
@@ -1668,6 +1635,4 @@ BSSC_QA/
 
 ---
 
-**End of Presentation**
-
-For questions or contributions, please refer to the project repository.
+**End of Report**
