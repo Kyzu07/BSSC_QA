@@ -238,7 +238,7 @@ Each module is designed to be:
 ## 📚 Documentation
 
 For comprehensive documentation, see:
-- [**Framework Presentation**](framework_presentation.md) - Detailed technical documentation
+- [**Framework Presentation**](bssc_qa_presentation.md) - Detailed technical documentation
 - [**Blueprint**](BSSC_QA_blueprint.txt) - Original design document
 - [**Notebooks**](notebooks/) - Interactive tutorials and examples
 
