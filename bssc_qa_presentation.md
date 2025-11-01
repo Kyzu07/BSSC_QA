@@ -1213,7 +1213,7 @@ def export_results(self, results: Dict, output_path: str):
 ## 8. Vector Database & Embeddings
 
 ### ChromaDB Architecture
-
+![Vector Database](images/vector_db.png "VectorDB")
 ```
 ┌─────────────────────────────────────┐
 │        ChromaDB Collection          │
@@ -1296,6 +1296,8 @@ for result in results:
 
 #### Overview
 Bloom's Taxonomy is a hierarchical model for classifying educational learning objectives into levels of complexity.
+
+![Bloom's Taxonomy](images/Blooms-Taxonomy-1.png "Bloom's Taxonomy")
 
 #### Cognitive Levels
 ```
