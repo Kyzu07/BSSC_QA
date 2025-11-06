@@ -1,8 +1,8 @@
-# BSSC_QA Framework: Complete Technical Presentation
+# BSSC_QA Framework: Complete Technical Report
 
-**Author**: AI Systems Documentation  
+**Author**: Shah Imran.  
 **Date**: November 2025  
-**Version**: 1.0
+**Version**: 0.01
 
 ---
 
@@ -49,40 +49,7 @@ Sentence-BERT      - Text embeddings
 ## 2. Architecture & Design
 
 ### High-Level Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     BSSC_QA Framework                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────┐    ┌──────────────┐   ┌──────────────┐  │
-│  │   Document   │───▶│  Ingestion   │──▶│   Vector     │  │
-│  │   Loaders    │    │   Pipeline   │   │   Store      │  │
-│  └──────────────┘    └──────────────┘   └──────────────┘  │
-│                             │                    ▲         │
-│                             ▼                    │         │
-│  ┌─────────────────────────────────────────────┐│         │
-│  │          QA Pipeline Orchestrator           ││         │
-│  └─────────────────────────────────────────────┘│         │
-│                             │                    │         │
-│              ┌──────────────┼──────────────┐     │         │
-│              ▼              ▼              ▼     │         │
-│   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
-│   │  Generator   │ │  Synthesis   │ │  Evaluator   │     │
-│   │    Agent     │ │    Agent     │ │    Agent     │     │
-│   └──────────────┘ └──────────────┘ └──────────────┘     │
-│          │                 │                 │            │
-│          └─────────────────┴─────────────────┘            │
-│                             │                              │
-│                  ┌──────────┴──────────┐                  │
-│                  ▼                     ▼                   │
-│         ┌─────────────┐        ┌─────────────┐            │
-│         │    Tools    │        │     LLM     │            │
-│         │   System    │        │   Factory   │            │
-│         └─────────────┘        └─────────────┘            │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+![Architecture Diagram](images/framework_diagram.png "BSSC-QA")   
 
 ### Agent Workflow
 
@@ -608,10 +575,6 @@ if word_count > 100:
     suggestions.append('analytical')
 ```
 
-#### Bengali Language Support
-- Bengali sentence endings: `।`
-- Bengali question words: `কী`, `কি`, `কখন`, `কোথায়`, `কার`, `কেন`, `কিভাবে`
-- Bengali script entity detection: `[\u0980-\u09FF]{2,}`
 
 ---
 
@@ -1217,7 +1180,7 @@ def export_results(self, results: Dict, output_path: str):
 ## 8. Vector Database & Embeddings
 
 ### ChromaDB Architecture
-
+![Vector Database](images/vector_db.png "VectorDB")
 ```
 ┌─────────────────────────────────────┐
 │        ChromaDB Collection          │
@@ -1300,6 +1263,8 @@ for result in results:
 
 #### Overview
 Bloom's Taxonomy is a hierarchical model for classifying educational learning objectives into levels of complexity.
+
+![Bloom's Taxonomy](images/Blooms-Taxonomy-1.png "Bloom's Taxonomy")
 
 #### Cognitive Levels
 ```
@@ -1633,54 +1598,6 @@ print(f"Avg Score: {results['statistics']['average_score']:.2f}")
 
 ---
 
-## Summary
-
-### Key Strengths
-
-1. **Modular Architecture**
-   - Clean separation of concerns
-   - Easy to extend and modify
-   - Plugin-based tool system
-
-2. **Multi-LLM Support**
-   - Provider-agnostic design
-   - Easy to add new providers
-   - Different LLMs for different agents
-
-3. **Quality Assurance**
-   - Multi-stage evaluation
-   - Both rule-based and LLM-based validation
-   - Human-in-the-loop option
-
-4. **Flexibility**
-   - Config-driven behavior
-   - Support for multiple document formats
-   - Customizable chunking strategies
-
-5. **Production-Ready**
-   - Error handling and logging
-   - Progress tracking
-   - Batch processing support
-
-### Dependencies
-
-```
-langchain>=1.0.0
-langchain-chroma>=0.2.0
-langchain-google-genai>=2.0.0
-langchain-community>=0.3.0
-langchain-huggingface
-langgraph>=0.2.0
-chromadb>=0.5.0
-sentence-transformers>=3.0.0
-pydantic>=2.0.0
-pypdf
-python-docx
-beautifulsoup4
-requests
-tqdm
-```
-
 ### Project Structure
 
 ```
@@ -1718,6 +1635,4 @@ BSSC_QA/
 
 ---
 
-**End of Presentation**
-
-For questions or contributions, please refer to the project repository.
+**End of Report**
