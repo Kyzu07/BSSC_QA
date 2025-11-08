@@ -17,6 +17,7 @@ from tools.validation_tool import ValidationTool
 from tools.chunk_tool import ChunkAnalysisTool
 from pipeline.orchestrator import QAPipelineOrchestrator
 from datetime import datetime
+from utils.prompt_loader import PromptManager
 
 def main():
     """Run the full BSSC_QA pipeline."""
@@ -28,6 +29,11 @@ def main():
     config_path = base_path / 'config.json'
     cfg = load_config(config_path)
     print(f"\n✅ Configuration loaded from {config_path}")
+
+    prompt_manager = PromptManager(
+        prompt_path=cfg.prompts.path,
+        base_path=base_path
+    )
     
     # Initialize vector store
     vs_manager = VectorStoreManager(
@@ -75,9 +81,19 @@ def main():
     )
     
     # Create agents
-    generator = GeneratorAgent(generator_llm, retrieval_tool, chunk_analyzer)
-    synthesizer = SynthesisAgent(synthesis_llm, vs_manager, synthesis_cfg['max_evidence_spans'])
-    evaluator = EvaluatorAgent(evaluator_llm, validator, evaluator_cfg['quality_threshold'])
+    generator = GeneratorAgent(generator_llm, retrieval_tool, chunk_analyzer, prompt_manager)
+    synthesizer = SynthesisAgent(
+        synthesis_llm,
+        vs_manager,
+        synthesis_cfg['max_evidence_spans'],
+        prompt_manager
+    )
+    evaluator = EvaluatorAgent(
+        evaluator_llm,
+        validator,
+        evaluator_cfg['quality_threshold'],
+        prompt_manager
+    )
     print("✅ Agents initialized")
     
     # Create orchestrator

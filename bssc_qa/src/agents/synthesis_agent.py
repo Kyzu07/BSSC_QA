@@ -1,39 +1,25 @@
 """Answer Synthesis Agent for BSSC_QA."""
-from typing import Dict, Any, List
-from langgraph.prebuilt import create_react_agent
+from typing import Dict, Any, List, Optional
+import logging
 import uuid
+
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from utils.prompt_loader import PromptManager
 
 class SynthesisAgent:
     """Agent for synthesizing answers from evidence."""
     
-    def __init__(self, llm, vector_store_manager, max_evidence_spans: int = 3):
+    def __init__(self, llm, vector_store_manager, max_evidence_spans: int = 3,
+                 prompt_manager: Optional[PromptManager] = None):
         self.llm = llm
         self.vs_manager = vector_store_manager
         self.max_evidence_spans = max_evidence_spans
+        self.prompt_manager = prompt_manager or PromptManager()
+        self.prompts = self.prompt_manager.get_agent_prompts("synthesis")
         
-        # Create agent with no additional tools (uses retrieval internally)
-        self.agent = create_react_agent(
-            self.llm,
-            [],
-            prompt=self._get_system_prompt()
-        )
-    
-    def _get_system_prompt(self) -> str:
-        """Return system prompt for synthesis agent."""
-        return """You are an expert answer synthesizer. Your task is to create accurate, 
-comprehensive answers based on provided evidence.
-
-Guidelines:
-1. Base answers strictly on the evidence provided
-2. Be clear, concise, and well-structured
-3. Include relevant details and context
-4. Maintain factual accuracy
-5. Match answer complexity to question complexity
-
-Your answer should:
-- Directly address the question
-- Use evidence to support claims
-- Be complete but not unnecessarily verbose"""
+        self.agent = self._initialize_agent()
     
     def synthesize_answer(self, question: str, question_type: str = "factual") -> Dict[str, Any]:
         """Generate answer for a question using retrieved evidence.
@@ -50,23 +36,20 @@ Your answer should:
         
         # Format evidence
         evidence_text = self._format_evidence(evidence_docs)
-        print(f"🧾 Retrieved these evidences: \n{evidence_text}")
+        # print(f"🧾 Retrieved these evidences: \n{evidence_text[:256]}")
         
         # Generate answer
-        prompt = f"""Question: {question}
-Question Type: {question_type}
-
-Evidence:
-{evidence_text}
-
-Based on the evidence above, provide a clear and accurate answer to the question."""
+        prompt = self.prompt_manager.render(
+            "synthesis",
+            "user_template",
+            question=question,
+            question_type=question_type,
+            evidence=evidence_text
+        )
+        print(f"🧠 Synthesis prompt: \n{prompt[:512]}")
         
         try:
-            result = self.agent.invoke({
-                "messages": [{"role": "user", "content": prompt}]
-            })
-            
-            answer = result["messages"][-1].content
+            answer = self._invoke_prompt(prompt)
             
             return {
                 "qa_id": str(uuid.uuid4()),
@@ -96,3 +79,55 @@ Based on the evidence above, provide a clear and accurate answer to the question
             formatted.append(doc.page_content)
             formatted.append("")
         return "\n".join(formatted)
+
+    def _initialize_agent(self):
+        """Attempt to create a ReAct agent, falling back if tools are unsupported."""
+        try:
+            return create_react_agent(
+                self.llm,
+                [],
+                prompt=self.prompts["system"]
+            )
+        except NotImplementedError:
+            logging.warning(
+                "LLM %s does not support tool binding; falling back to direct prompting.",
+                type(self.llm).__name__,
+            )
+        except Exception as exc:
+            logging.warning(
+                "Falling back to direct prompting for synthesis agent: %s",
+                exc,
+            )
+        return None
+
+    def _invoke_prompt(self, prompt: str) -> str:
+        """Run the configured agent or call the LLM directly, returning answer text."""
+        if self.agent is not None:
+            result = self.agent.invoke({
+                "messages": [{"role": "user", "content": prompt}]
+            })
+            return self._content_to_string(result["messages"][-1].content)
+
+        messages = [
+            SystemMessage(content=self.prompts["system"]),
+            HumanMessage(content=prompt)
+        ]
+        result = self.llm.invoke(messages)
+        content = getattr(result, "content", result)
+        return self._content_to_string(content)
+
+    def _content_to_string(self, content: Any) -> str:
+        """Normalize response payload to plain text."""
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            segments = []
+            for item in content:
+                if isinstance(item, str):
+                    segments.append(item)
+                elif isinstance(item, dict):
+                    segments.append(item.get("text") or item.get("content") or "")
+                else:
+                    segments.append(str(item))
+            return "\n".join(filter(None, segments))
+        return str(content)

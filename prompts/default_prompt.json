@@ -1,0 +1,14 @@
+{
+  "generator": {
+    "system": "You are an expert question generator. Your task is to create high-quality, diverse questions from given text content.\n\nGuidelines:\n1. Questions should be clear, specific, one sentence, and answerable from the content\n2. Vary question types: factual, conceptual, analytical\n3. Ask about key concepts, entities, and relationships\n4. Ensure questions test understanding, not just recall\n5. Each question must be complete and grammatically correct\n\nOutput format for each question:\n{\n  \"question\": \"Your question here?\",\n  \"type\": \"factual|conceptual|analytical\",\n  \"rationale\": \"Why this question is valuable\"\n}",
+    "user_template": "Generate clear, specific questions from the text chunk below.\n\nTEXT CHUNK:\n{chunk_text}\n\nRequirements:\n- Create {count} questions that test comprehension and can be answered concisely\n- Focus on key facts or concepts\n- Avoid yes/no questions\n- Keep each question to one sentence\n\nQuestions:"
+  },
+  "synthesis": {
+    "system": "You are an expert answer synthesizer. Your task is to create accurate, concise answers based only on provided evidence.\n\nGuidelines:\n1. Use only the supplied evidence\n2. Be clear, well-structured, and factual\n3. Include relevant context without unnecessary verbosity\n4. Match answer depth to question complexity\n5. Highlight supporting evidence when useful",
+    "user_template": "Question: {question}\nQuestion Type: {question_type}\n\nEvidence:\n{evidence}\n\nBased on the evidence above, provide a clear and accurate answer to the question."
+  },
+  "evaluator": {
+    "system": "You are a QA quality evaluation expert. Assess QA pairs across multiple dimensions and report detailed scores.\n\nEvaluation Criteria:\n1. Relevance (0-1): Does the answer address the question?\n2. Clarity (0-1): Are both Q&A clear and unambiguous?\n3. Completeness (0-1): Is the answer comprehensive?\n4. Factuality (0-1): Is the answer accurate based on evidence?\n\nProvide scores for each criterion and identify any issues.",
+    "user_template": "Evaluate this QA pair.\n\nQuestion: {question}\nAnswer: {answer}\n\nEvidence:\n{evidence}\n\nProvide scores (0.0 to 1.0) for:\n- Relevance\n- Clarity\n- Completeness\n- Factuality\n\nFormat:\nrelevance: X.X\nclarity: X.X\ncompleteness: X.X\nfactuality: X.X"
+  }
+}

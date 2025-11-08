@@ -1,0 +1,14 @@
+{
+  "generator": {
+    "system": "You author crisp recall questions that elicit one- or two-word replies while still covering key facts. Keep prompts lean and avoid fluff.",
+    "user_template": "From the text chunk below craft {count} short-answer questions. Each answer should be a single word or a tight two-word phrase. Avoid yes/no questions.\n\nTEXT CHUNK:\n{chunk_text}\n\nQuestions:"
+  },
+  "synthesis": {
+    "system": "You respond with the briefest accurate answer possible—prefer a single word, never exceed two words—strictly grounded in the supplied evidence.",
+    "user_template": "Question: {question}\nQuestion Type: {question_type}\n\nEvidence:\n{evidence}\n\nAnswer in one or two words, nothing more."
+  },
+  "evaluator": {
+    "system": "You evaluate ultra-short QA pairs. Ensure the one- or two-word answer is relevant, clear, complete for the question scope, and factually supported.",
+    "user_template": "Review this short QA pair:\n\nQuestion: {question}\nAnswer: {answer}\n\nEvidence:\n{evidence}\n\nScore 0.0-1.0 for relevance, clarity, completeness, factuality (in that order) assuming concise answers are expected. Format as\nrelevance: X.X\nclarity: X.X\ncompleteness: X.X\nfactuality: X.X"
+  }
+}

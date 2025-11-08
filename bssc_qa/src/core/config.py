@@ -60,11 +60,18 @@ class AgentsConfig(BaseModel):
         """Allow dict-style access for compatibility with existing code."""
         return getattr(self, key)
 
+class PromptsConfig(BaseModel):
+    path: Optional[str] = Field(
+        default=None,
+        description="Path to the JSON file containing system/user prompts."
+    )
+
 class Config(BaseModel):
     llm: LLMConfig
     vector_store: VectorStoreConfig
     chunking: ChunkingConfig
     agents: AgentsConfig
+    prompts: PromptsConfig = Field(default_factory=PromptsConfig)
     bloom_level: Dict[str, Any]
     human_review: Dict[str, Any]
     export: Dict[str, Any]

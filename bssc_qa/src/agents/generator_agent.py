@@ -1,16 +1,24 @@
 """Question Generator Agent for BSSC_QA."""
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+import logging
+import uuid
+
 from langchain.tools import tool
 from langgraph.prebuilt import create_react_agent
-import uuid
+from langchain_core.messages import HumanMessage, SystemMessage
+
+from utils.prompt_loader import PromptManager
 
 class GeneratorAgent:
     """Agent for generating questions from text chunks."""
     
-    def __init__(self, llm, retrieval_tool, chunk_analysis_tool):
+    def __init__(self, llm, retrieval_tool, chunk_analysis_tool,
+                 prompt_manager: Optional[PromptManager] = None):
         self.llm = llm
         self.retrieval_tool = retrieval_tool
         self.chunk_analyzer = chunk_analysis_tool
+        self.prompt_manager = prompt_manager or PromptManager()
+        self.prompts = self.prompt_manager.get_agent_prompts("generator")
         
         # Define tools for agent
         @tool
@@ -20,10 +28,11 @@ class GeneratorAgent:
             suggested_types = self.chunk_analyzer.suggest_question_types(analysis)
             
             return f"""Content Analysis:
-- Sentences: {analysis['sentence_count']}
-- Key entities: {', '.join(analysis['entities'][:5])}
-- Contains numbers: {analysis['has_numbers']}
-- Suggested question types: {', '.join(suggested_types)}"""
+                    - Sentences: {analysis['sentence_count']}
+                    - Key entities: {', '.join(analysis['entities'][:5])}
+                    - Contains numbers: {analysis['has_numbers']}
+                    - Suggested question types: {', '.join(suggested_types)}
+                    """
         
         self.tools = [analyze_content]
         if self.retrieval_tool is not None:
@@ -36,31 +45,7 @@ class GeneratorAgent:
             if retrieval_tool_instance is not None:
                 self.tools.append(retrieval_tool_instance)
         
-        # Create agent
-        self.agent = create_react_agent(
-            self.llm,
-            self.tools,
-            prompt=self._get_system_prompt()
-        )
-    
-    def _get_system_prompt(self) -> str:
-        """Return system prompt for generator agent."""
-        return """You are an expert question generator. Your task is to create high-quality, 
-diverse questions from given text content.
-
-Guidelines:
-1. Questions should be clear, specific, and answerable from the content
-2. Vary question types: factual, conceptual, analytical
-3. Ask about key concepts, entities, and relationships
-4. Ensure questions test understanding, not just recall
-5. Each question should be complete and grammatically correct
-
-Output format for each question:
-{
-  "question": "Your question here?",
-  "type": "factual|conceptual|analytical",
-  "rationale": "Why this question is valuable"
-}"""
+        self.agent = self._initialize_agent()
     
     def generate_questions(self, chunk_text: str, count: int = 3) -> List[Dict[str, Any]]:
         """Generate questions from a text chunk.
@@ -72,19 +57,15 @@ Output format for each question:
         Returns:
             List of question dictionaries
         """
-        prompt = f"""Generate {count} diverse, high-quality questions from this content:
-
-{chunk_text}
-
-Provide exactly {count} questions in the specified JSON format."""
+        prompt = self.prompt_manager.render(
+            "generator",
+            "user_template",
+            chunk_text=chunk_text,
+            count=count
+        )
         
         try:
-            result = self.agent.invoke({
-                "messages": [{"role": "user", "content": prompt}]
-            })
-            
-            # Parse response
-            response_text = result["messages"][-1].content
+            response_text = self._invoke_prompt(prompt)
             
             # Simple parsing for now (can be enhanced)
             questions = self._parse_questions(response_text, chunk_text, count)
@@ -94,6 +75,22 @@ Provide exactly {count} questions in the specified JSON format."""
         except Exception as e:
             print(f"Error generating questions: {e}")
             return []
+    
+    def _content_to_string(self, content: Any) -> str:
+        """Normalize agent message content into a plain string."""
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            segments = []
+            for item in content:
+                if isinstance(item, str):
+                    segments.append(item)
+                elif isinstance(item, dict):
+                    segments.append(item.get("text") or item.get("content") or "")
+                else:
+                    segments.append(str(item))
+            return "\n".join(filter(None, segments))
+        return str(content)
     
     def _parse_questions(self, response: str, chunk_text: str, count: int) -> List[Dict[str, Any]]:
         """Parse LLM response into structured questions."""
@@ -133,3 +130,40 @@ Provide exactly {count} questions in the specified JSON format."""
                 })
         
         return questions[:count]
+
+    def _initialize_agent(self):
+        """Attempt to create a ReAct agent, fallback to direct prompting on failure."""
+        try:
+            return create_react_agent(
+                self.llm,
+                self.tools,
+                prompt=self.prompts["system"]
+            )
+        except NotImplementedError:
+            logging.warning(
+                "LLM %s does not support tool binding; falling back to direct prompting.",
+                type(self.llm).__name__,
+            )
+        except Exception as exc:
+            logging.warning(
+                "Falling back to direct prompting because create_react_agent failed: %s",
+                exc,
+            )
+        return None
+
+    def _invoke_prompt(self, prompt: str) -> str:
+        """Run either the ReAct agent or a direct LLM call and return the response text."""
+        if self.agent is not None:
+            result = self.agent.invoke({
+                "messages": [{"role": "user", "content": prompt}]
+            })
+            return self._content_to_string(result["messages"][-1].content)
+
+        # Direct call fallback
+        messages = [
+            SystemMessage(content=self.prompts["system"]),
+            HumanMessage(content=prompt)
+        ]
+        result = self.llm.invoke(messages)
+        content = getattr(result, "content", result)
+        return self._content_to_string(content)
