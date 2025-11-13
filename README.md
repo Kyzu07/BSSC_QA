@@ -64,7 +64,7 @@ cp config.json config.local.json
     "default_provider": "gemini",
     "providers": {
       "gemini": {
-        "api_key": "YOUR_GEMINI_API_KEY",      # Not necessary if you export it in the working environment. (GEMINI_API_KEY for gemeni)
+        "api_key": "YOUR_GEMINI_API_KEY",      # Not necessary if you export it in the working environment.
         "model": "gemini-2.5-flash",
         "temperature": 0.5
       }
