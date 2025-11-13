@@ -73,11 +73,16 @@ cp config.json config.local.json
 }
 ```
 
-**Security Note**: Use environment variables for API keys in production:
+**Security Note**: Use environment variables for API keys:
 ```bash
-export GEMINI_API_KEY="your-api-key-here"
+export GEMINI_API_KEY="your-api-key-here"     # Or you can hardcode it in the config.json file
 ```
-
+*Grab a free tier API from here for testing purpose 
+  1. Gemini: (https://aistudio.google.com/api-keys)
+  2. Mistral: (https://admin.mistral.ai/organization/api-keys)
+  3. Deepseek: (https://platform.deepseek.com/api_keys)
+  4. Huggingface: (https://huggingface.co/settings/tokens)
+  5. Openrouter: (https://openrouter.ai/settings/keys) # Not tested in this framework
 ### Quick Demo
 
 ```bash
