@@ -17,9 +17,9 @@ BSSC_QA automates QA dataset creation through a sophisticated three-agent system
 - 🤖 **Multi-Agent Architecture** - Generator, Synthesizer, and Evaluator agents working in concert
 - 🔄 **Multiple LLM Providers** - Gemini, DeepSeek, Mistral, and HuggingFace support
 - 💾 **Local Vector Storage** - ChromaDB with efficient similarity search
-- 📝 **Multi-Format Support** - Process TXT, PDF, HTML, DOCX files and URLs
-- ⚙️ **Config-Driven** - Zero code changes needed, fully customizable via JSON
-- 📊 **Quality Metrics** - Comprehensive validation and scoring system
+- 📝 **Multi-Format Support** - Process TXT, *PDF, HTML, DOCX* files and *URLs*
+- ⚙️ **Config-Driven** - Zero code changes needed, fully customizable via config and prompt JSON
+- 📊 **Quality Metrics** - Comprehensive, customizable validation and scoring system
 - 🎓 **Bloom's Taxonomy** - Optional cognitive complexity targeting
 - 🌏 **Bengali Support** - Full support for Bengali text processing (Make sure the LLM are capable of handling Bengali)
 
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 ### Configuration
 
-1. Copy the example config and add your API keys:
+1. Copy the example config and add your [API keys](https://github.com/Kyzu07/BSSC_QA/edit/main/README.md#grab-a-free-tier-api-from-here-for-testing-purpose-requires-account):
 
 ```bash
 cp config.json config.local.json
@@ -77,7 +77,7 @@ cp config.json config.local.json
 ```bash
 export GEMINI_API_KEY="your-api-key-here"     # Or you can hardcode it in the config.json file
 ```
-*Grab a free tier API from here for testing purpose 
+#### *Grab a free tier API from here for testing purpose (Requires account)* 
   1. Gemini: (https://aistudio.google.com/api-keys)
   2. Mistral: (https://admin.mistral.ai/organization/api-keys)
   3. Deepseek: (https://platform.deepseek.com/api_keys)
@@ -237,10 +237,10 @@ The framework supports mixing different LLMs for different agents:
 ```
 
 **Supported Providers**:
-- **Gemini** (`gemini-2.5-flash`) - Fast, efficient for generation
+- **Gemini** (`gemini-2.5-flash`) - Multilingual, Fast, efficient for generation
 - **DeepSeek** (`deepseek-chat`) - Excellent reasoning for synthesis
-- **Mistral** (`mistral-large-latest`) - Strong evaluation capabilities
-- **HuggingFace** (`meta-llama/Llama-3.1-8B-Instruct`) - Open-source option
+- **Mistral** (`mistral-large-latest`) - Good for small sized model
+- **HuggingFace** (`meta-llama/Llama-3.1-8B-Instruct`) - Open-source Emneddings & Models
 
 ### Chunking Configuration
 
